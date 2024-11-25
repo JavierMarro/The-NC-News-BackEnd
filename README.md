@@ -8,6 +8,8 @@ The database used is PostgreSQL and interactions are made using node-postgres. I
 
 For dependencies that need to be installed please check the package.json dependencies section.
 
+Endpoint articles has been tested to check that articles can be correctly selected by Id. Endpoint has also be tested against a range of possible errors.
+
 ---
 
 This portfolio project was created as part of a Digital Skills Bootcamp in Software Engineering provided by [Northcoders](https://northcoders.com/)
