@@ -6,13 +6,7 @@ The goal of this project is to develop an API that allows programmatic access to
 Running the project:
 The database used is PostgreSQL and interactions are made using node-postgres. In order to run the project, environment variables must be created. Please create two different .env files, one that links to the test database and another that links to the dev data.
 
-Dependencies need to be added:
-
-- Express (for server)
-- Jest (for testing)
-- Supertest (for testing endpoints)
-
-Then the seed will need setting-up and then running (using package.json scripts)
+For dependencies that need to be installed please check the package.json dependencies section.
 
 ---
 
