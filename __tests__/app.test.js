@@ -39,18 +39,7 @@ describe("GET /api/topics", () => {
   });
 });
 
-describe("Route not found", () => {
-  test("404: request to non-existent route", () => {
-    return request(app)
-      .get("/apirequestingdata")
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.message).toBe("Route not found");
-      });
-  });
-});
-
-describe("/api/articles/:article_id", () => {
+describe("GET /api/articles/:article_id", () => {
   test("200: responds with a single article chosen by Id number", () => {
     return request(app)
       .get("/api/articles/1")
@@ -84,6 +73,42 @@ describe("/api/articles/:article_id", () => {
       .expect(404)
       .then(({ body }) => {
         expect(body.message).toBe("article does not exist");
+      });
+  });
+});
+
+describe("GET /api/articles", () => {
+  test("200: Responds with an array of all the articles which contains the correct article data", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toHaveLength(13);
+        articles.forEach((article) => {
+          expect(article).toMatchObject({
+            article_id: expect.any(Number),
+            title: expect.any(String),
+            topic: expect.any(String),
+            author: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            comment_count: expect.any(String),
+            article_img_url: expect.any(String),
+          });
+          expect(Number(article.comment_count)).not.toBeNaN();
+        });
+      });
+  });
+});
+
+describe("Route not found", () => {
+  test("404: request to non-existent route", () => {
+    return request(app)
+      .get("/apirequestingdata")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("Route not found");
       });
   });
 });
