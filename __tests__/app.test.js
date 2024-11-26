@@ -45,14 +45,15 @@ describe("GET /api/articles/:article_id", () => {
       .get("/api/articles/1")
       .expect(200)
       .then(({ body }) => {
-        expect(body.article.article_id).toBe(1);
-        expect(body.article.title).toBe("Living in the shadow of a great man");
-        expect(body.article.topic).toBe("mitch");
-        expect(body.article.author).toBe("butter_bridge");
-        expect(body.article.body).toBe("I find this existence challenging");
-        expect(body.article.created_at).toBe("2020-07-09T20:11:00.000Z");
-        expect(body.article.votes).toBe(100);
-        expect(body.article.article_img_url).toBe(
+        const { article } = body;
+        expect(article.article_id).toBe(1);
+        expect(article.title).toBe("Living in the shadow of a great man");
+        expect(article.topic).toBe("mitch");
+        expect(article.author).toBe("butter_bridge");
+        expect(article.body).toBe("I find this existence challenging");
+        expect(article.created_at).toBe("2020-07-09T20:11:00.000Z");
+        expect(article.votes).toBe(100);
+        expect(article.article_img_url).toBe(
           "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
         );
       });
@@ -98,6 +99,54 @@ describe("GET /api/articles", () => {
           });
           expect(Number(article.comment_count)).not.toBeNaN();
         });
+      });
+  });
+});
+
+describe("GET /api/articles/:article_id/comments", () => {
+  test("200: Responds with an array of all the comments according to the article Id provided", () => {
+    return request(app)
+      .get("/api/articles/1/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments).toHaveLength(11);
+        comments.forEach((comment) => {
+          expect(comment).toMatchObject({
+            body: expect.any(String),
+            votes: expect.any(Number),
+            author: expect.any(String),
+            article_id: expect.any(Number),
+            created_at: expect.any(String),
+          });
+        });
+      });
+  });
+  test("200: Responds with an array of all the comments default sorted by most recent first", () => {
+    return request(app)
+      .get("/api/articles/3/comments")
+      .expect(200)
+      .then(({ body }) => {
+        const { comments } = body;
+        expect(comments).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+  test("400: sends an appropriate status and error message when given an invalid format id", () => {
+    return request(app)
+      .get("/api/articles/meltedbrain/comments")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe(
+          "Bad request - article Id can only be a number"
+        );
+      });
+  });
+  test("404: sends an appropriate status and error message when given a valid but non-existent id for the article", () => {
+    return request(app)
+      .get("/api/articles/666/comments")
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.message).toBe("article does not exist");
       });
   });
 });
