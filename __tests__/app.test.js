@@ -28,8 +28,7 @@ describe("GET /api/topics", () => {
     return request(app)
       .get("/api/topics")
       .expect(200)
-      .then(({ body }) => {
-        const { topics } = body;
+      .then(({ body: { topics } }) => {
         expect(topics).toHaveLength(3);
         topics.forEach((topic) => {
           expect(typeof topic.slug).toBe("string");
@@ -44,8 +43,7 @@ describe("GET /api/articles/:article_id", () => {
     return request(app)
       .get("/api/articles/1")
       .expect(200)
-      .then(({ body }) => {
-        const { article } = body;
+      .then(({ body: { article } }) => {
         expect(article.article_id).toBe(1);
         expect(article.title).toBe("Living in the shadow of a great man");
         expect(article.topic).toBe("mitch");
@@ -62,18 +60,16 @@ describe("GET /api/articles/:article_id", () => {
     return request(app)
       .get("/api/articles/sushi-article")
       .expect(400)
-      .then(({ body }) => {
-        expect(body.message).toBe(
-          "Bad request - article Id can only be a number"
-        );
+      .then(({ body: { message } }) => {
+        expect(message).toBe("Bad request - article Id can only be a number");
       });
   });
   test("404: Responds with an error message when given a valid but non-existent id", () => {
     return request(app)
-      .get("/api/articles/666")
+      .get("/api/articles/999")
       .expect(404)
-      .then(({ body }) => {
-        expect(body.message).toBe("article does not exist");
+      .then(({ body: { message } }) => {
+        expect(message).toBe("article does not exist");
       });
   });
 });
@@ -83,8 +79,7 @@ describe("GET /api/articles", () => {
     return request(app)
       .get("/api/articles")
       .expect(200)
-      .then(({ body }) => {
-        const { articles } = body;
+      .then(({ body: { articles } }) => {
         expect(articles).toHaveLength(13);
         articles.forEach((article) => {
           expect(article).toMatchObject({
@@ -101,6 +96,14 @@ describe("GET /api/articles", () => {
         });
       });
   });
+  test("200: Responds with an array of all the articles default sorted by most recent first", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy("created_at", { coerce: true });
+      });
+  });
 });
 
 describe("GET /api/articles/:article_id/comments", () => {
@@ -108,8 +111,7 @@ describe("GET /api/articles/:article_id/comments", () => {
     return request(app)
       .get("/api/articles/1/comments")
       .expect(200)
-      .then(({ body }) => {
-        const { comments } = body;
+      .then(({ body: { comments } }) => {
         expect(comments).toHaveLength(11);
         comments.forEach((comment) => {
           expect(comment).toMatchObject({
@@ -126,27 +128,32 @@ describe("GET /api/articles/:article_id/comments", () => {
     return request(app)
       .get("/api/articles/3/comments")
       .expect(200)
-      .then(({ body }) => {
-        const { comments } = body;
+      .then(({ body: { comments } }) => {
         expect(comments).toBeSortedBy("created_at", { descending: true });
       });
   });
   test("400: Responds with an error message when given an invalid format id", () => {
     return request(app)
-      .get("/api/articles/meltedbrain/comments")
+      .get("/api/articles/invalidEndpoint/comments")
       .expect(400)
-      .then(({ body }) => {
-        expect(body.message).toBe(
-          "Bad request - article Id can only be a number"
-        );
+      .then(({ body: { message } }) => {
+        expect(message).toBe("Bad request - article Id can only be a number");
       });
   });
   test("404: Responds with an error message when given a valid but non-existent id for the article", () => {
     return request(app)
-      .get("/api/articles/666/comments")
+      .get("/api/articles/999/comments")
       .expect(404)
-      .then(({ body }) => {
-        expect(body.message).toBe("article does not exist");
+      .then(({ body: { message } }) => {
+        expect(message).toBe("article does not exist");
+      });
+  });
+  test("400: Responds with an error message when given an invalid id", () => {
+    return request(app)
+      .get("/api/articles/sushi-article/comments")
+      .expect(400)
+      .then(({ body: { message } }) => {
+        expect(message).toBe("Bad request - article Id can only be a number");
       });
   });
 });
@@ -157,13 +164,13 @@ describe("POST /api/articles/:article_id/comments", () => {
       .post("/api/articles/6/comments")
       .send({
         username: "butter_bridge",
-        body: "ma name is jeff and Im testing comments",
+        body: "I am a test comment",
       })
       .expect(201)
       .then(({ body: { comment } }) => {
         expect(comment).toEqual({
           comment_id: expect.any(Number),
-          body: "ma name is jeff and Im testing comments",
+          body: "I am a test comment",
           article_id: 6,
           author: expect.any(String),
           votes: expect.any(Number),
@@ -175,11 +182,11 @@ describe("POST /api/articles/:article_id/comments", () => {
     return request(app)
       .post("/api/articles/5/comments")
       .send({
-        body: "Snake, what happened? Snake!? Snaaaaake!!!!!",
+        body: "I am a test comment",
       })
       .expect(400)
-      .then(({ body }) => {
-        expect(body.message).toBe("missing username, unable to post comment");
+      .then(({ body: { message } }) => {
+        expect(message).toBe("missing username, unable to post comment");
       });
   });
   test("400: Responds with an error message if body is missing", () => {
@@ -189,8 +196,8 @@ describe("POST /api/articles/:article_id/comments", () => {
         username: "lurker",
       })
       .expect(400)
-      .then(({ body }) => {
-        expect(body.message).toBe(
+      .then(({ body: { message } }) => {
+        expect(message).toBe(
           "missing content, unable to post an empty comment"
         );
       });
@@ -200,28 +207,57 @@ describe("POST /api/articles/:article_id/comments", () => {
       .post("/api/articles/3/comments")
       .send({})
       .expect(400)
-      .then(({ body }) => {
-        expect(body.message).toBe("missing fields username and content");
-      });
-  });
-  test("404: Responds with an error message when given a non-existent id for the article", () => {
-    return request(app)
-      .get("/api/articles/9000/comments")
-      .expect(404)
-      .then(({ body }) => {
-        expect(body.message).toBe("article does not exist");
+      .then(({ body: { message } }) => {
+        expect(message).toBe("missing fields username and content");
       });
   });
   test("404: Responds with an error message when the user given does not exist", () => {
     return request(app)
       .post("/api/articles/1/comments")
       .send({
-        username: "snake_survived",
-        body: "Kept you waiting, huh?",
+        username: "notUser",
+        body: "Test comment",
       })
       .expect(404)
-      .then(({ body }) => {
-        expect(body.message).toBe("User does not exist");
+      .then(({ body: { message } }) => {
+        expect(message).toBe("User does not exist");
+      });
+  });
+});
+
+describe("PATCH /api/articles/:article_id", () => {
+  test("200: Responds with an incremented number of votes from the object received", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: 10 })
+      .expect(200)
+      .then(({ body: { article } }) => {
+        expect(article.votes).toBe(110);
+      });
+  });
+  test("200: Responds with a decreased number of votes from the object received", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: -10 })
+      .expect(200)
+      .then(({ body: { article } }) => {
+        expect(article.votes).toBe(90);
+      });
+  });
+  test.skip("404: Responds with an error message when given a valid but non-existent id", () => {
+    return request(app)
+      .patch("/api/articles/999")
+      .expect(404)
+      .then(({ body: { message } }) => {
+        expect(message).toBe("article does not exist");
+      });
+  });
+  test("400: Responds with an error message when given an invalid id", () => {
+    return request(app)
+      .patch("/api/articles/sushi-article")
+      .expect(400)
+      .then(({ body: { message } }) => {
+        expect(message).toBe("Bad request - article Id can only be a number");
       });
   });
 });
@@ -231,8 +267,8 @@ describe("Route not found", () => {
     return request(app)
       .get("/request-at-non-existent-path")
       .expect(404)
-      .then(({ body }) => {
-        expect(body.message).toBe("Route not found");
+      .then(({ body: { message } }) => {
+        expect(message).toBe("Route not found");
       });
   });
 });

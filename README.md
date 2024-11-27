@@ -11,6 +11,7 @@ NC News is a backend server that uses a PostgreSQL database to retrieve news art
 Users can:
 
 - Make HTTP requests to a news server where they can find news articles.
+- Post new comments on articles and update votes.
 
 ## Set up instructions:
 
