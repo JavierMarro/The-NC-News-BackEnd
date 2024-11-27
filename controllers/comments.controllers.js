@@ -1,10 +1,14 @@
+const { checkArticleExists } = require("../models/articles.models");
 const { fetchComments, postComment } = require("../models/comments.models");
 
 exports.getComments = (req, res, next) => {
   const { article_id } = req.params;
 
-  fetchComments(article_id)
-    .then((comments) => {
+  const promises = [fetchComments(article_id)];
+  if (article_id) promises.push(checkArticleExists(article_id));
+
+  Promise.all(promises)
+    .then(([comments]) => {
       res.status(200).send({ comments });
     })
     .catch((err) => {
@@ -15,8 +19,11 @@ exports.getComments = (req, res, next) => {
 exports.addComment = (req, res, next) => {
   const newComment = req.body;
   const { article_id } = req.params;
-  postComment(newComment, article_id)
-    .then((comment) => {
+  const promises = [postComment(newComment, article_id)];
+  if (newComment && article_id) promises.push(checkArticleExists(article_id));
+
+  Promise.all(promises)
+    .then(([comment]) => {
       res.status(201).send({ comment });
     })
     .catch((err) => {

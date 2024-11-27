@@ -118,7 +118,6 @@ describe("GET /api/articles/:article_id/comments", () => {
             body: expect.any(String),
             votes: expect.any(Number),
             author: expect.any(String),
-            article_id: expect.any(Number),
             created_at: expect.any(String),
           });
         });
@@ -223,10 +222,22 @@ describe("POST /api/articles/:article_id/comments", () => {
         expect(message).toBe("User does not exist");
       });
   });
+  test("400: Responds with an error message when given an invalid id", () => {
+    return request(app)
+      .post("/api/articles/newspaper-article/comments")
+      .expect(400)
+      .send({
+        username: "butter_bridge",
+        body: "I am a test comment",
+      })
+      .then(({ body: { message } }) => {
+        expect(message).toBe("Bad request - article Id can only be a number");
+      });
+  });
 });
 
 describe("PATCH /api/articles/:article_id", () => {
-  test("200: Responds with an incremented number of votes from the object received", () => {
+  test("200: Responds with an increased number of votes from the object received", () => {
     return request(app)
       .patch("/api/articles/1")
       .send({ inc_votes: 10 })
@@ -244,17 +255,10 @@ describe("PATCH /api/articles/:article_id", () => {
         expect(article.votes).toBe(90);
       });
   });
-  test.skip("404: Responds with an error message when given a valid but non-existent id", () => {
-    return request(app)
-      .patch("/api/articles/999")
-      .expect(404)
-      .then(({ body: { message } }) => {
-        expect(message).toBe("article does not exist");
-      });
-  });
   test("400: Responds with an error message when given an invalid id", () => {
     return request(app)
-      .patch("/api/articles/sushi-article")
+      .patch("/api/articles/ramen-article")
+      .send({ inc_votes: 5 })
       .expect(400)
       .then(({ body: { message } }) => {
         expect(message).toBe("Bad request - article Id can only be a number");
