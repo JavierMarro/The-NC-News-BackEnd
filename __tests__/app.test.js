@@ -264,6 +264,15 @@ describe("PATCH /api/articles/:article_id", () => {
         expect(message).toBe("Bad request - article Id can only be a number");
       });
   });
+  test("404: Responds with an error message when given a valid but non-existent id for the article", () => {
+    return request(app)
+      .patch("/api/articles/999")
+      .expect(404)
+      .send({ inc_votes: 5 })
+      .then(({ body: { message } }) => {
+        expect(message).toBe("article does not exist");
+      });
+  });
 });
 
 describe("Route not found", () => {
