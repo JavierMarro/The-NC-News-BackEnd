@@ -5,11 +5,12 @@ const { getTopics } = require("./controllers/topics.controllers");
 const {
   getArticleById,
   getArticles,
-  patchVotes,
+  patchArticle,
 } = require("./controllers/articles.controllers");
 const {
   getComments,
   addComment,
+  deleteComment,
 } = require("./controllers/comments.controllers");
 const {
   psqlErrorHandler,
@@ -30,7 +31,9 @@ app.get("/api/articles/:article_id/comments", getComments);
 
 app.post("/api/articles/:article_id/comments", addComment);
 
-app.patch("/api/articles/:article_id", patchVotes);
+app.patch("/api/articles/:article_id", patchArticle);
+
+app.delete("/api/comments/:comment_id", deleteComment);
 
 app.all("*", (req, res) => {
   res.status(404).send({ message: "Route not found" });
