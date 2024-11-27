@@ -17,11 +17,8 @@ exports.getArticles = (req, res, next) => {
 
 exports.getArticleById = (req, res, next) => {
   const { article_id } = req.params;
-  const promises = [fetchArticleById(article_id)];
-  if (article_id) promises.push(checkArticleExists(article_id));
-
-  Promise.all(promises)
-    .then(([article]) => {
+  fetchArticleById(article_id)
+    .then((article) => {
       res.status(200).send({ article });
     })
     .catch((err) => {
@@ -32,8 +29,11 @@ exports.getArticleById = (req, res, next) => {
 exports.patchVotes = (req, res, next) => {
   const { article_id } = req.params;
   const updatedBody = req.body.inc_votes;
-  updatedVotes(updatedBody, article_id)
-    .then((article) => {
+  const promises = [updatedVotes(updatedBody, article_id)];
+  if ((updatedBody, article_id)) promises.push(checkArticleExists(article_id));
+
+  Promise.all(promises)
+    .then(([article]) => {
       res.status(200).send({ article });
     })
     .catch((err) => {
