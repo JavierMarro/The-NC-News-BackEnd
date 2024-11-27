@@ -26,7 +26,7 @@ exports.getArticleById = (req, res, next) => {
     });
 };
 
-exports.patchVotes = (req, res, next) => {
+exports.patchArticle = (req, res, next) => {
   const { article_id } = req.params;
   const updatedBody = req.body.inc_votes;
   const promises = [updatedVotes(updatedBody, article_id)];
