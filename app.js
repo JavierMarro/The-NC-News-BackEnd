@@ -6,11 +6,16 @@ const {
   getArticleById,
   getArticles,
 } = require("./controllers/articles.controllers");
-const { getComments } = require("./controllers/comments.controllers");
+const {
+  getComments,
+  addComment,
+} = require("./controllers/comments.controllers");
 const {
   psqlErrorHandler,
   customErrorHandler,
 } = require("./error_handlers/api.error.handlers");
+
+app.use(express.json());
 
 app.get("/api", getApi);
 
@@ -21,6 +26,8 @@ app.get("/api/articles", getArticles);
 app.get("/api/articles/:article_id", getArticleById);
 
 app.get("/api/articles/:article_id/comments", getComments);
+
+app.post("/api/articles/:article_id/comments", addComment);
 
 app.all("*", (req, res) => {
   res.status(404).send({ message: "Route not found" });
