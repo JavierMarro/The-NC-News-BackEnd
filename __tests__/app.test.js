@@ -61,7 +61,7 @@ describe("GET /api/articles/:article_id", () => {
       .get("/api/articles/sushi-article")
       .expect(400)
       .then(({ body: { message } }) => {
-        expect(message).toBe("Bad request - Id can only be a number");
+        expect(message).toBe("Bad request - incorrect data type");
       });
   });
   test("404: Responds with an error message when given a valid but non-existent id", () => {
@@ -136,7 +136,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/invalidEndpoint/comments")
       .expect(400)
       .then(({ body: { message } }) => {
-        expect(message).toBe("Bad request - Id can only be a number");
+        expect(message).toBe("Bad request - incorrect data type");
       });
   });
   test("404: Responds with an error message when given a valid but non-existent id for the article", () => {
@@ -223,7 +223,7 @@ describe("POST /api/articles/:article_id/comments", () => {
         body: "I am a test comment",
       })
       .then(({ body: { message } }) => {
-        expect(message).toBe("Bad request - Id can only be a number");
+        expect(message).toBe("Bad request - incorrect data type");
       });
   });
 });
@@ -247,13 +247,22 @@ describe("PATCH /api/articles/:article_id", () => {
         expect(article.votes).toBe(90);
       });
   });
+  test("400: Responds with an error message if incorrect data type is used for votes", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: "vote" })
+      .expect(400)
+      .then(({ body: { message } }) => {
+        expect(message).toBe("Bad request - incorrect data type");
+      });
+  });
   test("400: Responds with an error message when given an invalid id", () => {
     return request(app)
       .patch("/api/articles/ramen-article")
       .send({ inc_votes: 5 })
       .expect(400)
       .then(({ body: { message } }) => {
-        expect(message).toBe("Bad request - Id can only be a number");
+        expect(message).toBe("Bad request - incorrect data type");
       });
   });
   test("404: Responds with an error message when given a valid but non-existent id for the article", () => {
@@ -284,14 +293,30 @@ describe("DELETE /api/comments/:comment_id", () => {
         expect(message).toBe("comment not found");
       });
   });
+  test("400: Responds with an error message when given an invalid id", () => {
+    return request(app)
+      .delete("/api/comments/not-a-number")
+      .expect(400)
+      .then(({ body: { message } }) => {
+        expect(message).toBe("Bad request - incorrect data type");
+      });
+  });
 });
-test("400: Responds with an error message when given an invalid id", () => {
-  return request(app)
-    .delete("/api/comments/not-a-number")
-    .expect(400)
-    .then(({ body: { message } }) => {
-      expect(message).toBe("Bad request - Id can only be a number");
-    });
+
+describe("GET /api/users", () => {
+  test("200: Responds with an array of all the users", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body: { users } }) => {
+        expect(users).toHaveLength(4);
+        users.forEach((user) => {
+          expect(typeof user.username).toBe("string");
+          expect(typeof user.name).toBe("string");
+          expect(typeof user.avatar_url).toBe("string");
+        });
+      });
+  });
 });
 
 describe("Route not found", () => {
