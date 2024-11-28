@@ -319,6 +319,56 @@ describe("GET /api/users", () => {
   });
 });
 
+describe("GET /api/articles/sorting_queries", () => {
+  test("200: accepts a sort_by query which sorts by one key (descending order by default)", () => {
+    return request(app)
+      .get("/api/articles?sort_by=topic")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toHaveLength(13);
+        expect(articles).toBeSortedBy("topic", { descending: true });
+      });
+  });
+  test("200: accepts an order query (key created_at as default)", () => {
+    return request(app)
+      .get("/api/articles?order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+
+        expect(articles).toHaveLength(13);
+        expect(articles).toBeSortedBy("created_at", { ascending: true });
+      });
+  });
+  test("200: accepts a sort_by query which sorts by key and order", () => {
+    return request(app)
+      .get("/api/articles?sort_by=title&order=asc")
+      .expect(200)
+      .then(({ body }) => {
+        const { articles } = body;
+        expect(articles).toHaveLength(13);
+        expect(articles).toBeSortedBy("title", { ascending: true });
+      });
+  });
+  test("400: Responds with an error message if invalid sort_by is used for queries", () => {
+    return request(app)
+      .get("/api/articles?sort_by=invalidSort")
+      .expect(400)
+      .then(({ body: { message } }) => {
+        expect(message).toBe("Bad request");
+      });
+  });
+  test("400: Responds with an error message if invalid order is used for queries", () => {
+    return request(app)
+      .get("/api/articles?order=invalidOrder")
+      .expect(400)
+      .then(({ body: { message } }) => {
+        expect(message).toBe("Bad request");
+      });
+  });
+});
+
 describe("Route not found", () => {
   test("404: request to non-existent route", () => {
     return request(app)
