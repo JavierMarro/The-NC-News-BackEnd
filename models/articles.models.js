@@ -1,12 +1,31 @@
 const db = require("../db/connection");
 
 exports.fetchAllArticles = (sort_by = "created_at", order = "DESC") => {
+  const validSortBy = [
+    "article_id",
+    "title",
+    "topic",
+    "author",
+    "created_at",
+    "votes",
+  ];
+  if (!validSortBy.includes(sort_by)) {
+    return Promise.reject({ status: 400, message: "Bad request" });
+  }
+  const validOrder = ["ASC", "DESC"];
+  if (!validOrder.includes(order.toUpperCase())) {
+    return Promise.reject({ status: 400, message: "Bad request" });
+  }
+
   let sqlQuery = `SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comment_id) AS comment_count
   FROM articles
   LEFT JOIN comments
   ON articles.article_id = comments.article_id
-  GROUP BY articles.article_id;`;
+  GROUP BY articles.article_id `;
 
+  if ((sort_by, order)) {
+    sqlQuery += `ORDER BY ${sort_by} ${order.toUpperCase()} `;
+  }
   return db.query(sqlQuery).then(({ rows }) => {
     return rows;
   });
