@@ -101,7 +101,7 @@ describe("GET /api/articles", () => {
       .get("/api/articles")
       .expect(200)
       .then(({ body: { articles } }) => {
-        expect(articles).toBeSortedBy("created_at", { coerce: true });
+        expect(articles).toBeSortedBy("created_at", { descending: true });
       });
   });
 });
@@ -109,10 +109,10 @@ describe("GET /api/articles", () => {
 describe("GET /api/articles/:article_id/comments", () => {
   test("200: Responds with an array of all the comments according to the article Id provided", () => {
     return request(app)
-      .get("/api/articles/1/comments")
+      .get("/api/articles/5/comments")
       .expect(200)
       .then(({ body: { comments } }) => {
-        expect(comments).toHaveLength(11);
+        expect(comments).toHaveLength(2);
         comments.forEach((comment) => {
           expect(comment).toMatchObject({
             body: expect.any(String),
@@ -123,9 +123,18 @@ describe("GET /api/articles/:article_id/comments", () => {
         });
       });
   });
+  // test("200: Responds with an empty object it the article Id provided exists but the article has no comments", () => {
+  //   return request(app)
+  //     .get("/api/articles/2/comments")
+  //     .expect(200)
+  //     .then(({ body: { comment } }) => {
+  //       expect(comment).toHaveLength(0);
+  //       expect(comment).toEqual({});
+  //     });
+  // });
   test("200: Responds with an array of all the comments default sorted by most recent first", () => {
     return request(app)
-      .get("/api/articles/3/comments")
+      .get("/api/articles/1/comments")
       .expect(200)
       .then(({ body: { comments } }) => {
         expect(comments).toBeSortedBy("created_at", { descending: true });
@@ -231,11 +240,11 @@ describe("POST /api/articles/:article_id/comments", () => {
 describe("PATCH /api/articles/:article_id", () => {
   test("200: Responds with an increased number of votes from the object received", () => {
     return request(app)
-      .patch("/api/articles/1")
+      .patch("/api/articles/2")
       .send({ inc_votes: 10 })
       .expect(200)
       .then(({ body: { article } }) => {
-        expect(article.votes).toBe(110);
+        expect(article.votes).toBe(10);
       });
   });
   test("200: Responds with a decreased number of votes from the object received", () => {
@@ -279,7 +288,7 @@ describe("PATCH /api/articles/:article_id", () => {
 describe("DELETE /api/comments/:comment_id", () => {
   test("204: Removes the body of the comment selected by its Id", () => {
     return request(app)
-      .delete("/api/comments/1")
+      .delete("/api/comments/2")
       .expect(204)
       .then(({ body }) => {
         expect(body).toEqual({});
@@ -320,14 +329,49 @@ describe("GET /api/users", () => {
 });
 
 describe("GET /api/articles/sorting_queries", () => {
-  test("200: accepts a sort_by query which sorts by one key (descending order by default)", () => {
+  test("200: accepts a sort_by query which sorts by title", () => {
+    return request(app)
+      .get("/api/articles?sort_by=title")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toHaveLength(13);
+        expect(articles).toBeSortedBy("title", { descending: true });
+      });
+  });
+  test("200: accepts a sort_by query which sorts by topic", () => {
     return request(app)
       .get("/api/articles?sort_by=topic")
       .expect(200)
-      .then(({ body }) => {
-        const { articles } = body;
+      .then(({ body: { articles } }) => {
         expect(articles).toHaveLength(13);
         expect(articles).toBeSortedBy("topic", { descending: true });
+      });
+  });
+  test("200: accepts a sort_by query which sorts by author", () => {
+    return request(app)
+      .get("/api/articles?sort_by=author")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toHaveLength(13);
+        expect(articles).toBeSortedBy("author", { descending: true });
+      });
+  });
+  test("200: Responds with an array of all the articles sorted by when the article was created", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toHaveLength(13);
+        expect(articles).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+  test("200: accepts a sort_by query which sorts by votes", () => {
+    return request(app)
+      .get("/api/articles?sort_by=votes")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toHaveLength(13);
+        expect(articles).toBeSortedBy("votes", { descending: true });
       });
   });
   test("200: accepts an order query (key created_at as default)", () => {
@@ -338,7 +382,7 @@ describe("GET /api/articles/sorting_queries", () => {
         const { articles } = body;
 
         expect(articles).toHaveLength(13);
-        expect(articles).toBeSortedBy("created_at", { ascending: true });
+        expect(articles).toBeSortedBy("created_at", { descending: false });
       });
   });
   test("200: accepts a sort_by query which sorts by key and order", () => {
@@ -348,7 +392,7 @@ describe("GET /api/articles/sorting_queries", () => {
       .then(({ body }) => {
         const { articles } = body;
         expect(articles).toHaveLength(13);
-        expect(articles).toBeSortedBy("title", { ascending: true });
+        expect(articles).toBeSortedBy("title", { descending: false });
       });
   });
   test("400: Responds with an error message if invalid sort_by is used for queries", () => {
