@@ -1,6 +1,6 @@
 const db = require("../db/connection");
 
-exports.fetchAllArticles = (sort_by = "created_at", order = "DESC") => {
+exports.fetchAllArticles = (sort_by = "created_at", order = "DESC", topic) => {
   const validSortBy = [
     "article_id",
     "title",
@@ -17,37 +17,32 @@ exports.fetchAllArticles = (sort_by = "created_at", order = "DESC") => {
     return Promise.reject({ status: 400, message: "Bad request" });
   }
 
-  let sqlQuery = `SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comment_id) AS comment_count
+  let whereSort = " ";
+  const queryValues = [];
+  if (topic) {
+    whereSort = ` WHERE articles.topic = $1 `;
+    queryValues.push(topic);
+  }
+
+  let sqlQuery =
+    `SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comment_id) AS comment_count
   FROM articles
   LEFT JOIN comments
-  ON articles.article_id = comments.article_id
-  GROUP BY articles.article_id `;
+  ON articles.article_id = comments.article_id ` +
+    whereSort +
+    ` GROUP BY articles.article_id `;
 
   if ((sort_by, order)) {
-    sqlQuery += `ORDER BY ${sort_by} ${order.toUpperCase()} `;
+    sqlQuery += ` ORDER BY ${sort_by} ${order.toUpperCase()} `;
   }
-  return db.query(sqlQuery).then(({ rows }) => {
+  return db.query(sqlQuery, queryValues).then(({ rows }) => {
     return rows;
   });
 };
 
 exports.fetchArticleById = (article_id) => {
   return db
-    .query("SELECT * FROM articles WHERE article_id = $1;", [article_id])
-    .then(({ rows }) => {
-      if (rows.length === 0) {
-        return Promise.reject({
-          status: 404,
-          message: "article does not exist",
-        });
-      }
-      return rows[0];
-    });
-};
-
-exports.checkArticleExists = (article_id) => {
-  return db
-    .query("SELECT * FROM articles WHERE article_id = $1;", [article_id])
+    .query(`SELECT * FROM articles WHERE article_id = $1;`, [article_id])
     .then(({ rows }) => {
       if (rows.length === 0) {
         return Promise.reject({
@@ -70,5 +65,20 @@ exports.updatedVotes = (updatedBody, article_id) => {
     )
     .then(({ rows }) => {
       return rows[0];
+    });
+};
+
+exports.checkArticleExists = (article_id) => {
+  return db
+    .query("SELECT * FROM articles WHERE article_id = $1;", [article_id])
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({
+          status: 404,
+          message: "article does not exist",
+        });
+      } else {
+        return rows[0];
+      }
     });
 };
