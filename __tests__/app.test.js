@@ -435,6 +435,27 @@ describe("GET /api/articles/topic_query", () => {
   });
 });
 
+describe("GET /api/articles/:article_id", () => {
+  test("200: Responds with a single article chosen by Id number with a comment_count included", () => {
+    return request(app)
+      .get("/api/articles/1")
+      .then(({ body: { article } }) => {
+        expect(article).toEqual({
+          comment_count: 11,
+          article_id: 1,
+          author: "butter_bridge",
+          title: "Living in the shadow of a great man",
+          body: "I find this existence challenging",
+          topic: "mitch",
+          created_at: "2020-07-09T20:11:00.000Z",
+          votes: 100,
+          article_img_url:
+            "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+        });
+      });
+  });
+});
+
 describe("Route not found", () => {
   test("404: request to non-existent route", () => {
     return request(app)
