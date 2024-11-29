@@ -425,6 +425,14 @@ describe("GET /api/articles/topic_query", () => {
         });
       });
   });
+  test("200: accepts a topic query which sorts by the topic selected even if there are no articles linked to it", () => {
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toHaveLength(0);
+      });
+  });
   test("404: Responds with an error message when given a valid but non-existent topic to sort articles by", () => {
     return request(app)
       .get("/api/articles?topic=invalidTopic")
