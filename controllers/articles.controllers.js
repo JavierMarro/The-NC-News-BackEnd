@@ -4,11 +4,15 @@ const {
   updatedVotes,
   checkArticleExists,
 } = require("../models/articles.models");
+const { fetchTopicIfSlugExists } = require("../models/topics.models");
 
 exports.getArticles = (req, res, next) => {
-  const { sort_by, order } = req.query;
-  fetchAllArticles(sort_by, order)
-    .then((articles) => {
+  const { sort_by, order, topic } = req.query;
+  const promises = [fetchAllArticles(sort_by, order, topic)];
+  if (topic) promises.push(fetchTopicIfSlugExists(topic));
+
+  Promise.all(promises)
+    .then(([articles]) => {
       res.status(200).send({ articles });
     })
     .catch((err) => {

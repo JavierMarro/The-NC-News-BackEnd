@@ -61,7 +61,7 @@ describe("GET /api/articles/:article_id", () => {
       .get("/api/articles/sushi-article")
       .expect(400)
       .then(({ body: { message } }) => {
-        expect(message).toBe("Bad request - incorrect data type");
+        expect(message).toBe("Bad request");
       });
   });
   test("404: Responds with an error message when given a valid but non-existent id", () => {
@@ -145,7 +145,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get("/api/articles/invalidEndpoint/comments")
       .expect(400)
       .then(({ body: { message } }) => {
-        expect(message).toBe("Bad request - incorrect data type");
+        expect(message).toBe("Bad request");
       });
   });
   test("404: Responds with an error message when given a valid but non-existent id for the article", () => {
@@ -232,7 +232,7 @@ describe("POST /api/articles/:article_id/comments", () => {
         body: "I am a test comment",
       })
       .then(({ body: { message } }) => {
-        expect(message).toBe("Bad request - incorrect data type");
+        expect(message).toBe("Bad request");
       });
   });
 });
@@ -262,7 +262,7 @@ describe("PATCH /api/articles/:article_id", () => {
       .send({ inc_votes: "vote" })
       .expect(400)
       .then(({ body: { message } }) => {
-        expect(message).toBe("Bad request - incorrect data type");
+        expect(message).toBe("Bad request");
       });
   });
   test("400: Responds with an error message when given an invalid id", () => {
@@ -271,7 +271,7 @@ describe("PATCH /api/articles/:article_id", () => {
       .send({ inc_votes: 5 })
       .expect(400)
       .then(({ body: { message } }) => {
-        expect(message).toBe("Bad request - incorrect data type");
+        expect(message).toBe("Bad request");
       });
   });
   test("404: Responds with an error message when given a valid but non-existent id for the article", () => {
@@ -307,7 +307,7 @@ describe("DELETE /api/comments/:comment_id", () => {
       .delete("/api/comments/not-a-number")
       .expect(400)
       .then(({ body: { message } }) => {
-        expect(message).toBe("Bad request - incorrect data type");
+        expect(message).toBe("Bad request");
       });
   });
 });
@@ -409,6 +409,28 @@ describe("GET /api/articles/sorting_queries", () => {
       .expect(400)
       .then(({ body: { message } }) => {
         expect(message).toBe("Bad request");
+      });
+  });
+});
+
+describe("GET /api/articles/topic_query", () => {
+  test("200: accepts a topic query which sorts by the topic selected", () => {
+    return request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toHaveLength(12);
+        articles.forEach((article) => {
+          expect(article.topic).toBe("mitch");
+        });
+      });
+  });
+  test("404: Responds with an error message when given a valid but non-existent topic to sort articles by", () => {
+    return request(app)
+      .get("/api/articles?topic=invalidTopic")
+      .expect(404)
+      .then(({ body: { message } }) => {
+        expect(message).toBe("Not found");
       });
   });
 });

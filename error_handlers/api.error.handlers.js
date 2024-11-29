@@ -1,7 +1,7 @@
 exports.psqlErrorHandler = (err, req, res, next) => {
   switch (err.code) {
     case "22P02":
-      res.status(400).send({ message: "Bad request - incorrect data type" });
+      res.status(400).send({ message: "Bad request" });
       break;
     case "23503":
       res.status(404).send({ message: "User does not exist" });
