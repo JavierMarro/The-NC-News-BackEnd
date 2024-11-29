@@ -4,6 +4,7 @@
 
 1. [Project description](#project-description)
 2. [Set up instructions](#set-up-instructions)
+3. [Running the API on a client](#running-the-api-on-a-client)
 
 ## Project description:
 
@@ -11,7 +12,8 @@ NC News is a backend server that uses a PostgreSQL database to retrieve news art
 Users can:
 
 - Make HTTP requests to a news server where they can find news articles.
-- Post new comments on articles and update votes.
+- Post, view and delete comments on articles and update votes.
+- Upvote and downvote articles.
 
 ## Set up instructions:
 
@@ -62,6 +64,30 @@ In order to create and seed the local databases please run the following command
 npm run setup-dbs
 npm run seed
 ```
+
+You should be ready to run and test the code once the above steps have been completed. as well as check its functionality.
+
+## Running the API on a client:
+
+Running the following command will get the PORT listening for requests:
+
+```
+npm run start
+```
+
+You should see a message on the terminal `Listening on 9090...`, this means the server is ready to accept requests. In order to break connection please use this command in the terminal: `Option + C` on Mac, `Ctrl + C` on Windows`.
+
+You will have to use a client like **Insomnia** to send GET requests and access the data.
+If using Insomnia:
+
+- Click on `Create` and `Request collection` from the drop down menu.
+- Then click on `New HTTP Request`, this will give you access to the search bar.
+- Use **`localhost:9090/api/`** in the search bar so you can find a list of all endpoints available.
+- Navegate to different endpoints using the search bar.
+
+![alt text](<Screenshot 2024-11-29 at 15.59.58.png>)
+
+![alt text](<Screenshot 2024-11-29 at 16.00.27.png>)
 
 ---
 

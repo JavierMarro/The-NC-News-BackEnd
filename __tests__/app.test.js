@@ -431,6 +431,7 @@ describe("GET /api/articles/topic_query", () => {
       .expect(200)
       .then(({ body: { articles } }) => {
         expect(articles).toHaveLength(0);
+        expect(articles).toEqual([]);
       });
   });
   test("404: Responds with an error message when given a valid but non-existent topic to sort articles by", () => {
