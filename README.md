@@ -85,9 +85,9 @@ If using Insomnia:
 - Use **`localhost:9090/api/`** in the search bar so you can find a list of all endpoints available.
 - Navegate to different endpoints using the search bar.
 
-![alt text](<Screenshot 2024-11-29 at 15.59.58.png>)
+![alt text](zendpoint1.png)
 
-![alt text](<Screenshot 2024-11-29 at 16.00.27.png>)
+![alt text](zendpoint2.png)
 
 ---
 
