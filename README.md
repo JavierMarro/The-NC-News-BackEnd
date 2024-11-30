@@ -1,10 +1,11 @@
-# :newspaper_roll: Northcoders News API :newspaper:
+# :newspaper_roll: The Northcoders News API :newspaper:
 
 **Sections:**
 
 1. [Project description](#project-description)
 2. [Set up instructions](#set-up-instructions)
 3. [Running the API on a client](#running-the-api-on-a-client)
+4. [Using the hosted API](#using-the-hosted-api-computer)
 
 ## Project description:
 
@@ -66,6 +67,11 @@ npm run seed
 ```
 
 You should be ready to run and test the code once the above steps have been completed. as well as check its functionality.
+This API has been created by doing Test-Driven-Development (TDD). In order to run the tests integrated please use the following command in terminal:
+
+```
+npm test
+```
 
 ## Running the API on a client:
 
@@ -75,7 +81,7 @@ Running the following command will get the PORT listening for requests:
 npm run start
 ```
 
-You should see a message on the terminal `Listening on 9090...`, this means the server is ready to accept requests. In order to break connection please use this command in the terminal: `Option + C` on Mac, `Ctrl + C` on Windows`.
+You should see a message on the terminal `Listening on 9090...`, this means the server is ready to accept requests. In order to break connection please use this command in the terminal: `Option + C` on Mac; `Ctrl + C` on Windows`.
 
 You will have to use a client like **Insomnia** to send GET requests and access the data.
 If using Insomnia:
@@ -83,11 +89,34 @@ If using Insomnia:
 - Click on `Create` and `Request collection` from the drop down menu.
 - Then click on `New HTTP Request`, this will give you access to the search bar.
 - Use **`localhost:9090/api/`** in the search bar so you can find a list of all endpoints available.
-- Navegate to different endpoints using the search bar.
+- Navegate to different endpoints using the search bar:
+  - **GET**
+    - /api
+    - /api/topics
+    - /api/articles
+    - /api/articles/:article_id
+    - /api/articles/:article_id/comments
+    - /api/articles/users
+  - **PATCH**
+    - /api/articles/:article_id
+  - **POST**
+    - /api/articles/:article_id/comments
+  - **DELETE**
+    - /api/comments/:comment_id
 
-![alt text](zendpoint1.png)
+Example of the output received using Insomia:
 
-![alt text](zendpoint2.png)
+![Insomnia/api](https://i.imgur.com/SGDvv40.png)
+
+![Insomnia/api/artice-id](https://i.imgur.com/at6Nxpv.png)
+
+## Using the hosted API :computer:
+
+Alternatively you can also check the above given endpoints to the API's version hosted on Render:
+
+```
+ https://the-nc-news.onrender.com
+```
 
 ---
 
