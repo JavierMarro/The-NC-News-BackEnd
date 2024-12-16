@@ -5,11 +5,14 @@ const articlesRoute = require("./routes/articles");
 const topicsRoute = require("./routes/topics");
 const commentsRoute = require("./routes/comments");
 const usersRoute = require("./routes/users");
+const cors = require("cors");
 
 const {
   psqlErrorHandler,
   customErrorHandler,
 } = require("./error_handlers/api.error.handlers");
+
+app.use(cors());
 
 app.use(express.json());
 
