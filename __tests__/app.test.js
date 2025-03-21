@@ -54,63 +54,39 @@ describe.only("POST /api/topics", () => {
         });
       });
   });
-  // test("400: Responds with an error message if username is missing", () => {
-  //   return request(app)
-  //     .post("/api/articles/5/comments")
-  //     .send({
-  //       body: "I am a test comment",
-  //     })
-  //     .expect(400)
-  //     .then(({ body: { message } }) => {
-  //       expect(message).toBe("missing username, unable to post comment");
-  //     });
-  // });
-  // test("400: Responds with an error message if body is missing", () => {
-  //   return request(app)
-  //     .post("/api/articles/2/comments")
-  //     .send({
-  //       username: "lurker",
-  //     })
-  //     .expect(400)
-  //     .then(({ body: { message } }) => {
-  //       expect(message).toBe(
-  //         "missing content, unable to post an empty comment"
-  //       );
-  //     });
-  // });
-  // test("400: Responds with an error message if username and body are missing", () => {
-  //   return request(app)
-  //     .post("/api/articles/3/comments")
-  //     .send({})
-  //     .expect(400)
-  //     .then(({ body: { message } }) => {
-  //       expect(message).toBe("missing fields username and content");
-  //     });
-  // });
-  // test("404: Responds with an error message when the user given does not exist", () => {
-  //   return request(app)
-  //     .post("/api/articles/1/comments")
-  //     .send({
-  //       username: "notUser",
-  //       body: "Test comment",
-  //     })
-  //     .expect(404)
-  //     .then(({ body: { message } }) => {
-  //       expect(message).toBe("User does not exist");
-  //     });
-  // });
-  // test("400: Responds with an error message when given an invalid id", () => {
-  //   return request(app)
-  //     .post("/api/articles/newspaper-article/comments")
-  //     .expect(400)
-  //     .send({
-  //       username: "butter_bridge",
-  //       body: "I am a test comment",
-  //     })
-  //     .then(({ body: { message } }) => {
-  //       expect(message).toBe("Bad request");
-  //     });
-  // });
+  test("400: Responds with an error message if slug is missing", () => {
+    return request(app)
+      .post("/api/topics")
+      .send({
+        description: "I am a test topic",
+      })
+      .expect(400)
+      .then(({ body: { message } }) => {
+        expect(message).toBe("missing slug, unable to post topic");
+      });
+  });
+  test("400: Responds with an error message if description is missing", () => {
+    return request(app)
+      .post("/api/topics")
+      .send({
+        slug: "cuisine",
+      })
+      .expect(400)
+      .then(({ body: { message } }) => {
+        expect(message).toBe(
+          "missing description, unable to post an empty topic"
+        );
+      });
+  });
+  test("400: Responds with an error message if slug and description are missing", () => {
+    return request(app)
+      .post("/api/topics")
+      .send({})
+      .expect(400)
+      .then(({ body: { message } }) => {
+        expect(message).toBe("missing fields slug and description");
+      });
+  });
 });
 
 describe("POST /api/articles", () => {
