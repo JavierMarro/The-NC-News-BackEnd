@@ -38,6 +38,69 @@ describe("GET /api/topics", () => {
   });
 });
 
+describe("POST /api/articles", () => {
+  test("201: Responds with a newly created article object", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        author: "icellusedkars",
+        title: "New article",
+        body: "I am a new article being posted. API works!",
+        topic: "cats",
+        article_img_url:
+          "https://www.qualityformationsblog.co.uk/wp-content/uploads/2019/12/Default.jpg?w=700&h=700",
+      })
+      .expect(201)
+      .then(({ body: { article } }) => {
+        expect(article).toMatchObject({
+          author: "icellusedkars",
+          title: "New article",
+          body: "I am a new article being posted. API works!",
+          topic: "cats",
+          article_id: expect.any(Number),
+          created_at: expect.any(String),
+          votes: expect.any(Number),
+          article_img_url:
+            "https://www.qualityformationsblog.co.uk/wp-content/uploads/2019/12/Default.jpg?w=700&h=700",
+          comment_count: expect.any(Number),
+        });
+      });
+  });
+  test("400: Responds with an error message if one field is missing: in this case author", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        title: "Test article",
+        body: "I am a test article being posted!",
+        topic: "cats",
+        article_img_url:
+          "https://www.qualityformationsblog.co.uk/wp-content/uploads/2019/12/Default.jpg?w=700&h=700",
+      })
+      .expect(400)
+      .then(({ body: { message } }) => {
+        expect(message).toBe(
+          "one of the fields is missing, unable to post article"
+        );
+      });
+  });
+  test("400: Responds with an error message if more than one field are missing: in this case title and body", () => {
+    return request(app)
+      .post("/api/articles")
+      .send({
+        author: "lurker",
+        topic: "cats",
+        article_img_url:
+          "https://www.qualityformationsblog.co.uk/wp-content/uploads/2019/12/Default.jpg?w=700&h=700",
+      })
+      .expect(400)
+      .then(({ body: { message } }) => {
+        expect(message).toBe(
+          "one of the fields is missing, unable to post article"
+        );
+      });
+  });
+});
+
 describe("GET /api/articles/:article_id", () => {
   test("200: Responds with a single article chosen by Id number", () => {
     return request(app)

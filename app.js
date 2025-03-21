@@ -20,9 +20,9 @@ app.use("/api", apiRoute);
 
 app.use("/api/articles", articlesRoute);
 
-app.use("/api/topics", topicsRoute);
-
 app.use("/api/comments", commentsRoute);
+
+app.use("/api/topics", topicsRoute);
 
 app.use("/api/users", usersRoute);
 
