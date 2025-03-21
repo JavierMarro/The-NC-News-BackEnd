@@ -38,6 +38,81 @@ describe("GET /api/topics", () => {
   });
 });
 
+describe.only("POST /api/topics", () => {
+  test("201: Responds with a newly created topic object", () => {
+    return request(app)
+      .post("/api/topics")
+      .send({
+        slug: "dogs",
+        description: "A human's best friendo",
+      })
+      .expect(201)
+      .then(({ body: { topic } }) => {
+        expect(topic).toEqual({
+          slug: "dogs",
+          description: "A human's best friendo",
+        });
+      });
+  });
+  // test("400: Responds with an error message if username is missing", () => {
+  //   return request(app)
+  //     .post("/api/articles/5/comments")
+  //     .send({
+  //       body: "I am a test comment",
+  //     })
+  //     .expect(400)
+  //     .then(({ body: { message } }) => {
+  //       expect(message).toBe("missing username, unable to post comment");
+  //     });
+  // });
+  // test("400: Responds with an error message if body is missing", () => {
+  //   return request(app)
+  //     .post("/api/articles/2/comments")
+  //     .send({
+  //       username: "lurker",
+  //     })
+  //     .expect(400)
+  //     .then(({ body: { message } }) => {
+  //       expect(message).toBe(
+  //         "missing content, unable to post an empty comment"
+  //       );
+  //     });
+  // });
+  // test("400: Responds with an error message if username and body are missing", () => {
+  //   return request(app)
+  //     .post("/api/articles/3/comments")
+  //     .send({})
+  //     .expect(400)
+  //     .then(({ body: { message } }) => {
+  //       expect(message).toBe("missing fields username and content");
+  //     });
+  // });
+  // test("404: Responds with an error message when the user given does not exist", () => {
+  //   return request(app)
+  //     .post("/api/articles/1/comments")
+  //     .send({
+  //       username: "notUser",
+  //       body: "Test comment",
+  //     })
+  //     .expect(404)
+  //     .then(({ body: { message } }) => {
+  //       expect(message).toBe("User does not exist");
+  //     });
+  // });
+  // test("400: Responds with an error message when given an invalid id", () => {
+  //   return request(app)
+  //     .post("/api/articles/newspaper-article/comments")
+  //     .expect(400)
+  //     .send({
+  //       username: "butter_bridge",
+  //       body: "I am a test comment",
+  //     })
+  //     .then(({ body: { message } }) => {
+  //       expect(message).toBe("Bad request");
+  //     });
+  // });
+});
+
 describe("POST /api/articles", () => {
   test("201: Responds with a newly created article object", () => {
     return request(app)
