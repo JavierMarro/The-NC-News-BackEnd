@@ -22,6 +22,24 @@
       "topics": [{ "slug": "football", "description": "Footie!" }]
     }
   },
+  "POST /api/topics": {
+    "description": "serves a newly created topic",
+    "queries": [],
+    "requestBody": [
+      {
+        "slug": "dogs",
+        "description": "A human's best friend"
+      }
+    ],
+    "exampleResponse": {
+      "topic": [
+        {
+          "slug": "dogs",
+          "description": "A human's best friend"
+        }
+      ]
+    }
+  },
   "GET /api/articles": {
     "description": "serves an array of all articles",
     "queries": [],

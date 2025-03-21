@@ -38,6 +38,57 @@ describe("GET /api/topics", () => {
   });
 });
 
+describe("POST /api/topics", () => {
+  test("201: Responds with a newly created topic object", () => {
+    return request(app)
+      .post("/api/topics")
+      .send({
+        slug: "dogs",
+        description: "A human's best friendo",
+      })
+      .expect(201)
+      .then(({ body: { topic } }) => {
+        expect(topic).toEqual({
+          slug: "dogs",
+          description: "A human's best friendo",
+        });
+      });
+  });
+  test("400: Responds with an error message if slug is missing", () => {
+    return request(app)
+      .post("/api/topics")
+      .send({
+        description: "I am a test topic",
+      })
+      .expect(400)
+      .then(({ body: { message } }) => {
+        expect(message).toBe("missing slug, unable to post topic");
+      });
+  });
+  test("400: Responds with an error message if description is missing", () => {
+    return request(app)
+      .post("/api/topics")
+      .send({
+        slug: "cuisine",
+      })
+      .expect(400)
+      .then(({ body: { message } }) => {
+        expect(message).toBe(
+          "missing description, unable to post an empty topic"
+        );
+      });
+  });
+  test("400: Responds with an error message if slug and description are missing", () => {
+    return request(app)
+      .post("/api/topics")
+      .send({})
+      .expect(400)
+      .then(({ body: { message } }) => {
+        expect(message).toBe("missing fields slug and description");
+      });
+  });
+});
+
 describe("POST /api/articles", () => {
   test("201: Responds with a newly created article object", () => {
     return request(app)
