@@ -5,6 +5,7 @@ const {
   getArticleById,
   getArticles,
   patchArticle,
+  addArticle,
 } = require("../controllers/articles.controllers");
 const {
   getComments,
@@ -12,6 +13,9 @@ const {
 } = require("../controllers/comments.controllers");
 
 router.get("/", getArticles);
+// TODO : make sure the endpoint's MVCs is finished
+// TODO : make sure endpoints.json entry is valid line 43
+router.post("/", addArticle);
 
 router.get("/:article_id", getArticleById);
 

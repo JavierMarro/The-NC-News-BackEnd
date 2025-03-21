@@ -40,6 +40,34 @@
       ]
     }
   },
+  "POST /api/articles": {
+    "description": "serves a newly created article",
+    "queries": [],
+    "requestBody": [
+      {
+        "title": "New article",
+        "topic": "coding",
+        "author": "tickle122",
+        "body": "I am a new article being posted. API works!",
+        "article_img_url": "https://www.qualityformationsblog.co.uk/wp-content/uploads/2019/12/Default.jpg?w=700&h=700"
+      }
+    ],
+    "exampleResponse": {
+      "article": [
+        {
+          "title": "New article",
+          "topic": "coding",
+          "author": "tickle122",
+          "body": "I am a new article being posted. API works!",
+          "article_id": 55,
+          "created_at": "2020-11-22T11:13:00.000Z",
+          "article_img_url": "https://www.qualityformationsblog.co.uk/wp-content/uploads/2019/12/Default.jpg",
+          "votes": 0,
+          "comment_count": "0"
+        }
+      ]
+    }
+  },
   "GET /api/articles/:article_id": {
     "description": "serves an a single article chosen by Id number",
     "queries": [],

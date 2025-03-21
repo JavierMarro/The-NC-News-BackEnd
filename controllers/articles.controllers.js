@@ -3,6 +3,7 @@ const {
   fetchAllArticles,
   updatedVotes,
   checkArticleExists,
+  postArticle,
 } = require("../models/articles.models");
 const { fetchTopicIfSlugExists } = require("../models/topics.models");
 
@@ -14,6 +15,17 @@ exports.getArticles = (req, res, next) => {
   Promise.all(promises)
     .then(([articles]) => {
       res.status(200).send({ articles });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+
+exports.addArticle = (req, res, next) => {
+  const newArticle = req.body;
+  postArticle(newArticle)
+    .then((article) => {
+      res.status(201).send({ article });
     })
     .catch((err) => {
       next(err);

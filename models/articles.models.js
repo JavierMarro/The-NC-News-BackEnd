@@ -62,6 +62,26 @@ exports.fetchArticleById = (article_id) => {
     });
 };
 
+exports.postArticle = (article) => {
+  const { author, title, body, topic, article_img_url } = article;
+
+  if (!author || !title || !body || !topic || !article_img_url) {
+    return Promise.reject({
+      status: 400,
+      message: "one of the fields is missing, unable to post article",
+    });
+  }
+
+  return db
+    .query(
+      `INSERT INTO articles(title, topic, author, body, article_img_url) VALUES ($1, $2, $3, $4, $5) RETURNING *, (SELECT COUNT(*)::int FROM comments WHERE comments.article_id = articles.article_id) as comment_count`,
+      [title, topic, author, body, article_img_url]
+    )
+    .then(({ rows }) => {
+      return rows[0];
+    });
+};
+
 exports.updatedVotes = (updatedBody, article_id) => {
   return db
     .query(
