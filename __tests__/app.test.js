@@ -38,7 +38,7 @@ describe("GET /api/topics", () => {
   });
 });
 
-describe.only("POST /api/topics", () => {
+describe("POST /api/topics", () => {
   test("201: Responds with a newly created topic object", () => {
     return request(app)
       .post("/api/topics")
