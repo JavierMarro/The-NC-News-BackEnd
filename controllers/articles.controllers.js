@@ -43,7 +43,6 @@ exports.getArticleById = (req, res, next) => {
       next(err);
     });
 };
-//TODO : Make sure controller handles article deletion
 exports.deleteArticle = (req, res, next) => {
   const { article_id } = req.params;
   if (article_id)

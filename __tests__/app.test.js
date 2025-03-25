@@ -286,7 +286,6 @@ describe("PATCH /api/articles/:article_id", () => {
   });
 });
 
-//TODO : Complete Unit tests for DELETE endpoint
 describe("DELETE /api/articles/:article_id", () => {
   test("204: Removes the article selected by its Id from database", () => {
     return request(app)

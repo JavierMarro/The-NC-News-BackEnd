@@ -18,7 +18,7 @@ router.get("/", getArticles);
 router.post("/", addArticle);
 
 router.get("/:article_id", getArticleById);
-//TODO : Make sure endpoint works for DELETE
+
 router.delete("/:article_id", deleteArticle);
 
 router.get("/:article_id/comments", getComments);
