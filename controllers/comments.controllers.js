@@ -38,14 +38,15 @@ exports.addComment = (req, res, next) => {
 
 exports.deleteComment = (req, res, next) => {
   const { comment_id } = req.params;
-  const promises = [removeCommentById(Number(comment_id))];
-  if (comment_id) promises.push(checkCommentExists(comment_id));
-
-  Promise.all(promises)
-    .then(() => {
-      res.status(204).send();
-    })
-    .catch((err) => {
-      next(err);
-    });
+  if (comment_id)
+    checkCommentExists(comment_id)
+      .then(() => {
+        return removeCommentById(comment_id);
+      })
+      .then(() => {
+        res.status(204).send();
+      })
+      .catch((err) => {
+        next(err);
+      });
 };

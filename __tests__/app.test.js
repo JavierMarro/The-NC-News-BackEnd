@@ -89,6 +89,38 @@ describe("POST /api/topics", () => {
   });
 });
 
+describe("GET /api/articles", () => {
+  test("200: Responds with an array of all the articles which contains the correct article data", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toHaveLength(13);
+        articles.forEach((article) => {
+          expect(article).toMatchObject({
+            article_id: expect.any(Number),
+            title: expect.any(String),
+            topic: expect.any(String),
+            author: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            comment_count: expect.any(String),
+            article_img_url: expect.any(String),
+          });
+          expect(Number(article.comment_count)).not.toBeNaN();
+        });
+      });
+  });
+  test("200: Responds with an array of all the articles default sorted by most recent first", () => {
+    return request(app)
+      .get("/api/articles")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy("created_at", { descending: true });
+      });
+  });
+});
+
 describe("POST /api/articles", () => {
   test("201: Responds with a newly created article object", () => {
     return request(app)
@@ -201,39 +233,88 @@ describe("GET /api/articles/:article_id", () => {
       .get("/api/articles/999")
       .expect(404)
       .then(({ body: { message } }) => {
-        expect(message).toBe("article does not exist");
+        expect(message).toBe("Article with Id 999 was not found");
       });
   });
 });
 
-describe("GET /api/articles", () => {
-  test("200: Responds with an array of all the articles which contains the correct article data", () => {
+describe("PATCH /api/articles/:article_id", () => {
+  test("200: Responds with an increased number of votes from the object received", () => {
     return request(app)
-      .get("/api/articles")
+      .patch("/api/articles/2")
+      .send({ inc_votes: 10 })
       .expect(200)
-      .then(({ body: { articles } }) => {
-        expect(articles).toHaveLength(13);
-        articles.forEach((article) => {
-          expect(article).toMatchObject({
-            article_id: expect.any(Number),
-            title: expect.any(String),
-            topic: expect.any(String),
-            author: expect.any(String),
-            created_at: expect.any(String),
-            votes: expect.any(Number),
-            comment_count: expect.any(String),
-            article_img_url: expect.any(String),
-          });
-          expect(Number(article.comment_count)).not.toBeNaN();
-        });
+      .then(({ body: { article } }) => {
+        expect(article.votes).toBe(10);
       });
   });
-  test("200: Responds with an array of all the articles default sorted by most recent first", () => {
+  test("200: Responds with a decreased number of votes from the object received", () => {
     return request(app)
-      .get("/api/articles")
+      .patch("/api/articles/1")
+      .send({ inc_votes: -10 })
       .expect(200)
-      .then(({ body: { articles } }) => {
-        expect(articles).toBeSortedBy("created_at", { descending: true });
+      .then(({ body: { article } }) => {
+        expect(article.votes).toBe(90);
+      });
+  });
+  test("400: Responds with an error message if incorrect data type is used for votes", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: "vote" })
+      .expect(400)
+      .then(({ body: { message } }) => {
+        expect(message).toBe("Bad request");
+      });
+  });
+  test("400: Responds with an error message when given an invalid id", () => {
+    return request(app)
+      .patch("/api/articles/ramen-article")
+      .send({ inc_votes: 5 })
+      .expect(400)
+      .then(({ body: { message } }) => {
+        expect(message).toBe("Bad request");
+      });
+  });
+  test("404: Responds with an error message when given a valid but non-existent id for the article", () => {
+    return request(app)
+      .patch("/api/articles/999")
+      .expect(404)
+      .send({ inc_votes: 5 })
+      .then(({ body: { message } }) => {
+        expect(message).toBe("Article with Id 999 was not found");
+      });
+  });
+});
+
+//TODO : Complete Unit tests for DELETE endpoint
+describe("DELETE /api/articles/:article_id", () => {
+  test("204: Removes the article selected by its Id from database", () => {
+    return request(app)
+      .delete("/api/articles/1")
+      .expect(204)
+      .then((res) => {
+        return request(app)
+          .get("/api/articles")
+          .expect(200)
+          .then(({ body }) => {
+            expect(body.articles.length).toBe(12);
+          });
+      });
+  });
+  test("404: Responds with an error message when given a valid but non-existent id for the article", () => {
+    return request(app)
+      .delete("/api/articles/200")
+      .expect(404)
+      .then(({ body: { message } }) => {
+        expect(message).toBe("Article with Id 200 was not found");
+      });
+  });
+  test("400: Responds with an error message when given an invalid id", () => {
+    return request(app)
+      .delete("/api/articles/not-a-number")
+      .expect(400)
+      .then(({ body: { message } }) => {
+        expect(message).toBe("Bad request");
       });
   });
 });
@@ -369,61 +450,17 @@ describe("POST /api/articles/:article_id/comments", () => {
   });
 });
 
-describe("PATCH /api/articles/:article_id", () => {
-  test("200: Responds with an increased number of votes from the object received", () => {
-    return request(app)
-      .patch("/api/articles/2")
-      .send({ inc_votes: 10 })
-      .expect(200)
-      .then(({ body: { article } }) => {
-        expect(article.votes).toBe(10);
-      });
-  });
-  test("200: Responds with a decreased number of votes from the object received", () => {
-    return request(app)
-      .patch("/api/articles/1")
-      .send({ inc_votes: -10 })
-      .expect(200)
-      .then(({ body: { article } }) => {
-        expect(article.votes).toBe(90);
-      });
-  });
-  test("400: Responds with an error message if incorrect data type is used for votes", () => {
-    return request(app)
-      .patch("/api/articles/1")
-      .send({ inc_votes: "vote" })
-      .expect(400)
-      .then(({ body: { message } }) => {
-        expect(message).toBe("Bad request");
-      });
-  });
-  test("400: Responds with an error message when given an invalid id", () => {
-    return request(app)
-      .patch("/api/articles/ramen-article")
-      .send({ inc_votes: 5 })
-      .expect(400)
-      .then(({ body: { message } }) => {
-        expect(message).toBe("Bad request");
-      });
-  });
-  test("404: Responds with an error message when given a valid but non-existent id for the article", () => {
-    return request(app)
-      .patch("/api/articles/999")
-      .expect(404)
-      .send({ inc_votes: 5 })
-      .then(({ body: { message } }) => {
-        expect(message).toBe("article does not exist");
-      });
-  });
-});
-
 describe("DELETE /api/comments/:comment_id", () => {
   test("204: Removes the body of the comment selected by its Id", () => {
     return request(app)
-      .delete("/api/comments/2")
+      .delete("/api/comments/1")
       .expect(204)
-      .then(({ body }) => {
-        expect(body).toEqual({});
+      .then(() => {
+        return request(app)
+          .get("/api/articles/9/comments")
+          .then(({ body }) => {
+            expect(body.comments.length).toBe(1);
+          });
       });
   });
   test("404: Responds with an error message when given a valid but non-existent id for the comment", () => {
@@ -431,7 +468,7 @@ describe("DELETE /api/comments/:comment_id", () => {
       .delete("/api/comments/300")
       .expect(404)
       .then(({ body: { message } }) => {
-        expect(message).toBe("comment not found");
+        expect(message).toBe("Comment with Id 300 was not found");
       });
   });
   test("400: Responds with an error message when given an invalid id", () => {
