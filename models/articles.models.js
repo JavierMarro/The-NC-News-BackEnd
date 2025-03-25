@@ -95,7 +95,7 @@ exports.updatedVotes = (updatedBody, article_id) => {
       return rows[0];
     });
 };
-//TODO : Make sure model handles article deletion
+// The model underneath makes sure that comments are deleted first to avoid foreign key constraint errors
 exports.removeArticleById = (article_id) => {
   db.query(`DELETE FROM comments WHERE article_id = $1`, [article_id]).then(
     () => {
