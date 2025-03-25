@@ -170,6 +170,13 @@
       ]
     }
   },
+  "DELETE /api/articles/:article_id": {
+    "description": "Deletes an article based on its id, and also deletes all associated comments.",
+    "queries": [],
+    "exampleResponse": {
+      "status": 204
+    }
+  },
   "DELETE /api/comments/:comment_id": {
     "description": "deletes a comment from the id provided",
     "queries": [],

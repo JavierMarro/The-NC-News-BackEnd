@@ -55,7 +55,7 @@ exports.fetchArticleById = (article_id) => {
       if (rows.length === 0) {
         return Promise.reject({
           status: 404,
-          message: "article does not exist",
+          message: `Article with Id ${article_id} was not found`,
         });
       }
       return rows[0];
@@ -95,6 +95,17 @@ exports.updatedVotes = (updatedBody, article_id) => {
       return rows[0];
     });
 };
+// The model underneath makes sure that comments are deleted first to avoid foreign key constraint errors
+exports.removeArticleById = (article_id) => {
+  db.query(`DELETE FROM comments WHERE article_id = $1`, [article_id]).then(
+    () => {
+      return db.query(
+        `DELETE FROM articles WHERE article_id = $1 RETURNING *`,
+        [article_id]
+      );
+    }
+  );
+};
 
 exports.checkArticleExists = (article_id) => {
   return db
@@ -103,10 +114,8 @@ exports.checkArticleExists = (article_id) => {
       if (rows.length === 0) {
         return Promise.reject({
           status: 404,
-          message: "article does not exist",
+          message: `Article with Id ${article_id} was not found`,
         });
-      } else {
-        return rows[0];
       }
     });
 };

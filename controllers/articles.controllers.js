@@ -4,6 +4,7 @@ const {
   updatedVotes,
   checkArticleExists,
   postArticle,
+  removeArticleById,
 } = require("../models/articles.models");
 const { fetchTopicIfSlugExists } = require("../models/topics.models");
 
@@ -41,6 +42,20 @@ exports.getArticleById = (req, res, next) => {
     .catch((err) => {
       next(err);
     });
+};
+exports.deleteArticle = (req, res, next) => {
+  const { article_id } = req.params;
+  if (article_id)
+    checkArticleExists(article_id)
+      .then(() => {
+        return removeArticleById(article_id);
+      })
+      .then(() => {
+        res.status(204).send();
+      })
+      .catch((err) => {
+        next(err);
+      });
 };
 
 exports.patchArticle = (req, res, next) => {

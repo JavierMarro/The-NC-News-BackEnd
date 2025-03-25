@@ -6,6 +6,7 @@ const {
   getArticles,
   patchArticle,
   addArticle,
+  deleteArticle,
 } = require("../controllers/articles.controllers");
 const {
   getComments,
@@ -17,6 +18,8 @@ router.get("/", getArticles);
 router.post("/", addArticle);
 
 router.get("/:article_id", getArticleById);
+
+router.delete("/:article_id", deleteArticle);
 
 router.get("/:article_id/comments", getComments);
 
