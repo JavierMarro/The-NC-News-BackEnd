@@ -53,6 +53,20 @@ exports.postComment = (comment, article_id) => {
       return rows[0];
     });
 };
+//TODO: implement model PATCH for comments' votes
+exports.updatedCommentVotes = (updatedBody, comment_id) => {
+  return db
+    .query(
+      `UPDATE comments
+    SET votes = votes + $1
+    WHERE comment_id = $2
+    RETURNING *`,
+      [updatedBody, comment_id]
+    )
+    .then(({ rows }) => {
+      return rows[0];
+    });
+};
 
 exports.removeCommentById = (comment_id) => {
   return db.query(`DELETE FROM comments WHERE comment_id = $1`, [comment_id]);

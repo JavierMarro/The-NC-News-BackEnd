@@ -1,7 +1,7 @@
 const {
   fetchArticleById,
   fetchAllArticles,
-  updatedVotes,
+  updatedArticleVotes,
   checkArticleExists,
   postArticle,
   removeArticleById,
@@ -61,7 +61,7 @@ exports.deleteArticle = (req, res, next) => {
 exports.patchArticle = (req, res, next) => {
   const { article_id } = req.params;
   const updatedBody = req.body.inc_votes;
-  const promises = [updatedVotes(updatedBody, article_id)];
+  const promises = [updatedArticleVotes(updatedBody, article_id)];
   if ((updatedBody, article_id)) promises.push(checkArticleExists(article_id));
 
   Promise.all(promises)

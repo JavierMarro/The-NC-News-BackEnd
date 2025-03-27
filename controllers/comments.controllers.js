@@ -4,6 +4,7 @@ const {
   postComment,
   removeCommentById,
   checkCommentExists,
+  updatedCommentVotes,
 } = require("../models/comments.models");
 
 exports.getComments = (req, res, next) => {
@@ -30,6 +31,21 @@ exports.addComment = (req, res, next) => {
   Promise.all(promises)
     .then(([comment]) => {
       res.status(201).send({ comment });
+    })
+    .catch((err) => {
+      next(err);
+    });
+};
+//TODO: implement controller PATCH for comments' votes
+exports.patchComment = (req, res, next) => {
+  const { comment_id } = req.params;
+  const updatedBody = req.body.inc_votes;
+  const promises = [updatedCommentVotes(updatedBody, comment_id)];
+  if ((updatedBody, comment_id)) promises.push(checkCommentExists(comment_id));
+
+  Promise.all(promises)
+    .then(([comment]) => {
+      res.status(200).send({ comment });
     })
     .catch((err) => {
       next(err);
