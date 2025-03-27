@@ -19,12 +19,12 @@ router.post("/", addArticle);
 
 router.get("/:article_id", getArticleById);
 
+router.patch("/:article_id", patchArticle);
+
 router.delete("/:article_id", deleteArticle);
 
 router.get("/:article_id/comments", getComments);
 
 router.post("/:article_id/comments", addComment);
-
-router.patch("/:article_id", patchArticle);
 
 module.exports = router;
