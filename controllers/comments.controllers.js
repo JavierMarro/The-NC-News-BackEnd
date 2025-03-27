@@ -36,7 +36,7 @@ exports.addComment = (req, res, next) => {
       next(err);
     });
 };
-//TODO: implement controller PATCH for comments' votes
+
 exports.patchComment = (req, res, next) => {
   const { comment_id } = req.params;
   const updatedBody = req.body.inc_votes;

@@ -448,7 +448,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       });
   });
 });
-//TODO: comments votes testing
+
 describe("PATCH /api/comments/:comment_id", () => {
   test("200: Responds with an increased number of votes from the object received", () => {
     return request(app)

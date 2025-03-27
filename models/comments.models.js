@@ -53,7 +53,7 @@ exports.postComment = (comment, article_id) => {
       return rows[0];
     });
 };
-//TODO: implement model PATCH for comments' votes
+
 exports.updatedCommentVotes = (updatedBody, comment_id) => {
   return db
     .query(
