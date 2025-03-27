@@ -449,7 +449,7 @@ describe("POST /api/articles/:article_id/comments", () => {
   });
 });
 //TODO: comments votes testing
-describe.only("PATCH /api/comments/:comment_id", () => {
+describe("PATCH /api/comments/:comment_id", () => {
   test("200: Responds with an increased number of votes from the object received", () => {
     return request(app)
       .patch("/api/comments/10")
@@ -459,42 +459,42 @@ describe.only("PATCH /api/comments/:comment_id", () => {
         expect(comment.votes).toBe(1);
       });
   });
-  // test("200: Responds with a decreased number of votes from the object received", () => {
-  //   return request(app)
-  //     .patch("/api/comments/10")
-  //     .send({ inc_votes: -1 })
-  //     .expect(200)
-  //     .then(({ body: { comment } }) => {
-  //       expect(comment.votes).toBe(-1);
-  //     });
-  // });
-  // test("400: Responds with an error message if incorrect data type is used for votes", () => {
-  //   return request(app)
-  //     .patch("/api/articles/1")
-  //     .send({ inc_votes: "vote" })
-  //     .expect(400)
-  //     .then(({ body: { message } }) => {
-  //       expect(message).toBe("Bad request");
-  //     });
-  // });
-  // test("400: Responds with an error message when given an invalid id", () => {
-  //   return request(app)
-  //     .patch("/api/articles/ramen-article")
-  //     .send({ inc_votes: 5 })
-  //     .expect(400)
-  //     .then(({ body: { message } }) => {
-  //       expect(message).toBe("Bad request");
-  //     });
-  // });
-  // test("404: Responds with an error message when given a valid but non-existent id for the article", () => {
-  //   return request(app)
-  //     .patch("/api/articles/999")
-  //     .expect(404)
-  //     .send({ inc_votes: 5 })
-  //     .then(({ body: { message } }) => {
-  //       expect(message).toBe("Article with Id 999 was not found");
-  //     });
-  // });
+  test("200: Responds with a decreased number of votes from the object received", () => {
+    return request(app)
+      .patch("/api/comments/10")
+      .send({ inc_votes: -1 })
+      .expect(200)
+      .then(({ body: { comment } }) => {
+        expect(comment.votes).toBe(-1);
+      });
+  });
+  test("400: Responds with an error message if incorrect data type is used for votes", () => {
+    return request(app)
+      .patch("/api/comments/10")
+      .send({ inc_votes: "vote" })
+      .expect(400)
+      .then(({ body: { message } }) => {
+        expect(message).toBe("Bad request");
+      });
+  });
+  test("400: Responds with an error message when given an invalid id for the comment", () => {
+    return request(app)
+      .patch("/api/comments/switcheroo-comment")
+      .send({ inc_votes: 5 })
+      .expect(400)
+      .then(({ body: { message } }) => {
+        expect(message).toBe("Bad request");
+      });
+  });
+  test("404: Responds with an error message when given a valid but non-existent id for the comment", () => {
+    return request(app)
+      .patch("/api/comments/999")
+      .expect(404)
+      .send({ inc_votes: 5 })
+      .then(({ body: { message } }) => {
+        expect(message).toBe("Comment with Id 999 was not found");
+      });
+  });
 });
 
 describe("DELETE /api/comments/:comment_id", () => {
