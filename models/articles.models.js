@@ -42,13 +42,13 @@ exports.fetchAllArticles = (
     whereSort +
     ` GROUP BY articles.article_id `;
 
-  if ((sort_by, order)) {
+  if (sort_by && order) {
     sqlQuery += ` ORDER BY ${sort_by} ${order.toUpperCase()} `;
   }
 
   sqlQuery += ` LIMIT $${queryValues.length + 1} OFFSET $${
     queryValues.length + 2
-  };`;
+  }`;
   queryValues.push(limit, offset);
 
   return db.query(sqlQuery, queryValues).then(({ rows }) => {
@@ -59,13 +59,30 @@ exports.fetchAllArticles = (
 exports.fetchTotalArticles = (topic) => {
   let queryValues = [];
   let queryStr = `SELECT COUNT(*)::int AS total_count FROM articles`;
+
   if (topic) {
-    queryStr += ` WHERE topic = $1`;
-    queryValues.push(topic);
+    // First check if the topic exists
+    return db
+      .query(`SELECT * FROM topics WHERE slug = $1`, [topic])
+      .then(({ rows }) => {
+        if (rows.length === 0) {
+          return Promise.reject({ status: 404, message: "Not found" });
+        }
+
+        // If topic exists, proceed with the count query
+        queryStr += ` WHERE topic = $1`;
+        queryValues.push(topic);
+
+        return db
+          .query(queryStr, queryValues)
+          .then(({ rows }) => rows[0].total_count);
+      });
+  } else {
+    // If no topic filter, just perform the count
+    return db
+      .query(queryStr, queryValues)
+      .then(({ rows }) => rows[0].total_count);
   }
-  return db
-    .query(queryStr, queryValues)
-    .then(({ rows }) => rows[0].total_count);
 };
 
 exports.fetchArticleById = (article_id) => {
