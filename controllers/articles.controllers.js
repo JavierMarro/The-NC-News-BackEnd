@@ -24,7 +24,6 @@ exports.getArticles = (req, res, next) => {
     fetchAllArticles(sort_by, order, topic, limitNum, page),
     fetchTotalArticles(topic),
   ];
-  if (topic) promises.push(fetchTopicIfSlugExists(topic));
 
   Promise.all(promises)
     .then(([articles, total_count]) => {
@@ -75,7 +74,7 @@ exports.patchArticle = (req, res, next) => {
   const { article_id } = req.params;
   const updatedBody = req.body.inc_votes;
   const promises = [updatedArticleVotes(updatedBody, article_id)];
-  if ((updatedBody, article_id)) promises.push(checkArticleExists(article_id));
+  if (updatedBody && article_id) promises.push(checkArticleExists(article_id));
 
   Promise.all(promises)
     .then(([article]) => {
