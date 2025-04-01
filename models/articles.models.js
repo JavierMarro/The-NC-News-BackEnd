@@ -1,6 +1,12 @@
 const db = require("../db/connection");
 
-exports.fetchAllArticles = (sort_by = "created_at", order = "DESC", topic) => {
+exports.fetchAllArticles = (
+  sort_by = "created_at",
+  order = "DESC",
+  topic,
+  limit = 10,
+  p = 1
+) => {
   const validSortBy = [
     "article_id",
     "title",
@@ -9,20 +15,24 @@ exports.fetchAllArticles = (sort_by = "created_at", order = "DESC", topic) => {
     "created_at",
     "votes",
   ];
-  if (!validSortBy.includes(sort_by)) {
-    return Promise.reject({ status: 400, message: "Bad request" });
-  }
   const validOrder = ["ASC", "DESC"];
-  if (!validOrder.includes(order.toUpperCase())) {
-    return Promise.reject({ status: 400, message: "Bad request" });
+
+  if (
+    !validSortBy.includes(sort_by) ||
+    !validOrder.includes(order.toUpperCase())
+  ) {
+    return Promise.reject({ status: 400, message: "Invalid sorting query" });
   }
 
-  let whereSort = " ";
   const queryValues = [];
+  let whereSort = " ";
   if (topic) {
     whereSort = ` WHERE articles.topic = $1 `;
     queryValues.push(topic);
   }
+
+  let offset = 0;
+  if (p) offset = (p - 1) * limit;
 
   let sqlQuery =
     `SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, COUNT(comment_id) AS comment_count
@@ -35,9 +45,27 @@ exports.fetchAllArticles = (sort_by = "created_at", order = "DESC", topic) => {
   if ((sort_by, order)) {
     sqlQuery += ` ORDER BY ${sort_by} ${order.toUpperCase()} `;
   }
+
+  sqlQuery += ` LIMIT $${queryValues.length + 1} OFFSET $${
+    queryValues.length + 2
+  };`;
+  queryValues.push(limit, offset);
+
   return db.query(sqlQuery, queryValues).then(({ rows }) => {
     return rows;
   });
+};
+
+exports.fetchTotalArticles = (topic) => {
+  let queryValues = [];
+  let queryStr = `SELECT COUNT(*)::int AS total_count FROM articles`;
+  if (topic) {
+    queryStr += ` WHERE topic = $1`;
+    queryValues.push(topic);
+  }
+  return db
+    .query(queryStr, queryValues)
+    .then(({ rows }) => rows[0].total_count);
 };
 
 exports.fetchArticleById = (article_id) => {

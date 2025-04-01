@@ -95,7 +95,7 @@ describe("GET /api/articles", () => {
       .get("/api/articles")
       .expect(200)
       .then(({ body: { articles } }) => {
-        expect(articles).toHaveLength(13);
+        expect(articles).toHaveLength(10);
         articles.forEach((article) => {
           expect(article).toMatchObject({
             article_id: expect.any(Number),
@@ -296,7 +296,7 @@ describe("DELETE /api/articles/:article_id", () => {
           .get("/api/articles")
           .expect(200)
           .then(({ body }) => {
-            expect(body.articles.length).toBe(12);
+            expect(body.articles.length).toBe(10);
           });
       });
   });
@@ -550,7 +550,7 @@ describe("GET /api/articles/sorting_queries", () => {
       .get("/api/articles?sort_by=title")
       .expect(200)
       .then(({ body: { articles } }) => {
-        expect(articles).toHaveLength(13);
+        expect(articles).toHaveLength(10);
         expect(articles).toBeSortedBy("title", { descending: true });
       });
   });
@@ -559,7 +559,7 @@ describe("GET /api/articles/sorting_queries", () => {
       .get("/api/articles?sort_by=topic")
       .expect(200)
       .then(({ body: { articles } }) => {
-        expect(articles).toHaveLength(13);
+        expect(articles).toHaveLength(10);
         expect(articles).toBeSortedBy("topic", { descending: true });
       });
   });
@@ -568,7 +568,7 @@ describe("GET /api/articles/sorting_queries", () => {
       .get("/api/articles?sort_by=author")
       .expect(200)
       .then(({ body: { articles } }) => {
-        expect(articles).toHaveLength(13);
+        expect(articles).toHaveLength(10);
         expect(articles).toBeSortedBy("author", { descending: true });
       });
   });
@@ -577,7 +577,7 @@ describe("GET /api/articles/sorting_queries", () => {
       .get("/api/articles")
       .expect(200)
       .then(({ body: { articles } }) => {
-        expect(articles).toHaveLength(13);
+        expect(articles).toHaveLength(10);
         expect(articles).toBeSortedBy("created_at", { descending: true });
       });
   });
@@ -586,7 +586,7 @@ describe("GET /api/articles/sorting_queries", () => {
       .get("/api/articles?sort_by=votes")
       .expect(200)
       .then(({ body: { articles } }) => {
-        expect(articles).toHaveLength(13);
+        expect(articles).toHaveLength(10);
         expect(articles).toBeSortedBy("votes", { descending: true });
       });
   });
@@ -597,7 +597,7 @@ describe("GET /api/articles/sorting_queries", () => {
       .then(({ body }) => {
         const { articles } = body;
 
-        expect(articles).toHaveLength(13);
+        expect(articles).toHaveLength(10);
         expect(articles).toBeSortedBy("created_at", { descending: false });
       });
   });
@@ -607,7 +607,7 @@ describe("GET /api/articles/sorting_queries", () => {
       .expect(200)
       .then(({ body }) => {
         const { articles } = body;
-        expect(articles).toHaveLength(13);
+        expect(articles).toHaveLength(10);
         expect(articles).toBeSortedBy("title", { descending: false });
       });
   });
@@ -616,7 +616,7 @@ describe("GET /api/articles/sorting_queries", () => {
       .get("/api/articles?sort_by=invalidSort")
       .expect(400)
       .then(({ body: { message } }) => {
-        expect(message).toBe("Bad request");
+        expect(message).toBe("Invalid sorting query");
       });
   });
   test("400: Responds with an error message if invalid order is used for queries", () => {
@@ -624,7 +624,7 @@ describe("GET /api/articles/sorting_queries", () => {
       .get("/api/articles?order=invalidOrder")
       .expect(400)
       .then(({ body: { message } }) => {
-        expect(message).toBe("Bad request");
+        expect(message).toBe("Invalid sorting query");
       });
   });
 });
@@ -635,7 +635,7 @@ describe("GET /api/articles/topic_query", () => {
       .get("/api/articles?topic=mitch")
       .expect(200)
       .then(({ body: { articles } }) => {
-        expect(articles).toHaveLength(12);
+        expect(articles).toHaveLength(10);
         articles.forEach((article) => {
           expect(article.topic).toBe("mitch");
         });
@@ -656,6 +656,61 @@ describe("GET /api/articles/topic_query", () => {
       .expect(404)
       .then(({ body: { message } }) => {
         expect(message).toBe("Not found");
+      });
+  });
+});
+
+describe("?p & limit", () => {
+  test("GET: 200 takes optional limit (limits the number of responses) query, and responds with the articles paginated according to the limit provided", () => {
+    return request(app)
+      .get("/api/articles?limit=5")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(5);
+      });
+  });
+  test("GET: 200 takes additional p query (specifies the page at which to start) and responds with the array paginated according to the limit and page provided", () => {
+    return request(app)
+      .get("/api/articles?limit=5&p=3")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(3);
+      });
+  });
+  test("GET: 200 returns paginated array and a total_count property (which displays the total number of articles with any filters applied, discounting the limit)", () => {
+    return request(app)
+      .get("/api/articles?limit=5&p=3")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.total_count).toBe(13);
+      });
+  });
+  test("GET: 200 returns paginated array, with limit defaulting to 10 if not provided", () => {
+    return request(app)
+      .get("/api/articles?p=2")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(3);
+      });
+  });
+  test("GET: 400 responds with appropriate status code and error message if passed an invalid limit (must be an integer)", () => {
+    return request(app)
+      .get("/api/articles?limit=notalimit")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe(
+          "Invalid values, input must be a positive integer"
+        );
+      });
+  });
+  test("GET: 400 responds with appropriate status code and error message if passed an invalid page number (must be an integer)", () => {
+    return request(app)
+      .get("/api/articles?p=notanumber")
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.message).toBe(
+          "Invalid values, input must be a positive integer"
+        );
       });
   });
 });
