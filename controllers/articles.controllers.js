@@ -5,17 +5,30 @@ const {
   checkArticleExists,
   postArticle,
   removeArticleById,
+  fetchTotalArticles,
 } = require("../models/articles.models");
 const { fetchTopicIfSlugExists } = require("../models/topics.models");
 //TODO : Implement pagination
 exports.getArticles = (req, res, next) => {
-  const { sort_by, order, topic } = req.query;
-  const promises = [fetchAllArticles(sort_by, order, topic)];
+  const { sort_by, order, topic, limit = 10, p = 1 } = req.query;
+  const limitNum = Number(limit);
+  const page = Number(p);
+  if (isNaN(limitNum) || limitNum < 1 || isNaN(page) || page < 1) {
+    return next({
+      status: 400,
+      message: "Invalid values, input must be a positive integer",
+    });
+  }
+
+  const promises = [
+    fetchAllArticles(sort_by, order, topic, limitNum, page),
+    fetchTotalArticles(topic),
+  ];
   if (topic) promises.push(fetchTopicIfSlugExists(topic));
 
   Promise.all(promises)
-    .then(([articles]) => {
-      res.status(200).send({ articles });
+    .then(([articles, total_count]) => {
+      res.status(200).send({ articles, total_count });
     })
     .catch((err) => {
       next(err);
