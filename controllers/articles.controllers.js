@@ -8,7 +8,7 @@ const {
   fetchTotalArticles,
 } = require("../models/articles.models");
 const { fetchTopicIfSlugExists } = require("../models/topics.models");
-//TODO : Implement pagination
+
 exports.getArticles = (req, res, next) => {
   const { sort_by, order, topic, limit = 10, p = 1 } = req.query;
   const limitNum = Number(limit);

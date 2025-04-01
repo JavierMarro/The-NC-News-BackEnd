@@ -1,5 +1,5 @@
 const db = require("../db/connection");
-//TODO: Implement pagination (using limit, p)
+
 exports.fetchAllArticles = (
   sort_by = "created_at",
   order = "DESC",

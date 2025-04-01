@@ -95,7 +95,7 @@ describe("GET /api/articles", () => {
       .get("/api/articles")
       .expect(200)
       .then(({ body: { articles } }) => {
-        expect(articles).toHaveLength(13);
+        expect(articles).toHaveLength(10);
         articles.forEach((article) => {
           expect(article).toMatchObject({
             article_id: expect.any(Number),
@@ -296,7 +296,7 @@ describe("DELETE /api/articles/:article_id", () => {
           .get("/api/articles")
           .expect(200)
           .then(({ body }) => {
-            expect(body.articles.length).toBe(12);
+            expect(body.articles.length).toBe(10);
           });
       });
   });
@@ -550,7 +550,7 @@ describe("GET /api/articles/sorting_queries", () => {
       .get("/api/articles?sort_by=title")
       .expect(200)
       .then(({ body: { articles } }) => {
-        expect(articles).toHaveLength(13);
+        expect(articles).toHaveLength(10);
         expect(articles).toBeSortedBy("title", { descending: true });
       });
   });
@@ -559,7 +559,7 @@ describe("GET /api/articles/sorting_queries", () => {
       .get("/api/articles?sort_by=topic")
       .expect(200)
       .then(({ body: { articles } }) => {
-        expect(articles).toHaveLength(13);
+        expect(articles).toHaveLength(10);
         expect(articles).toBeSortedBy("topic", { descending: true });
       });
   });
@@ -568,7 +568,7 @@ describe("GET /api/articles/sorting_queries", () => {
       .get("/api/articles?sort_by=author")
       .expect(200)
       .then(({ body: { articles } }) => {
-        expect(articles).toHaveLength(13);
+        expect(articles).toHaveLength(10);
         expect(articles).toBeSortedBy("author", { descending: true });
       });
   });
@@ -577,7 +577,7 @@ describe("GET /api/articles/sorting_queries", () => {
       .get("/api/articles")
       .expect(200)
       .then(({ body: { articles } }) => {
-        expect(articles).toHaveLength(13);
+        expect(articles).toHaveLength(10);
         expect(articles).toBeSortedBy("created_at", { descending: true });
       });
   });
@@ -586,7 +586,7 @@ describe("GET /api/articles/sorting_queries", () => {
       .get("/api/articles?sort_by=votes")
       .expect(200)
       .then(({ body: { articles } }) => {
-        expect(articles).toHaveLength(13);
+        expect(articles).toHaveLength(10);
         expect(articles).toBeSortedBy("votes", { descending: true });
       });
   });
@@ -597,7 +597,7 @@ describe("GET /api/articles/sorting_queries", () => {
       .then(({ body }) => {
         const { articles } = body;
 
-        expect(articles).toHaveLength(13);
+        expect(articles).toHaveLength(10);
         expect(articles).toBeSortedBy("created_at", { descending: false });
       });
   });
@@ -607,7 +607,7 @@ describe("GET /api/articles/sorting_queries", () => {
       .expect(200)
       .then(({ body }) => {
         const { articles } = body;
-        expect(articles).toHaveLength(13);
+        expect(articles).toHaveLength(10);
         expect(articles).toBeSortedBy("title", { descending: false });
       });
   });
@@ -635,7 +635,7 @@ describe("GET /api/articles/topic_query", () => {
       .get("/api/articles?topic=mitch")
       .expect(200)
       .then(({ body: { articles } }) => {
-        expect(articles).toHaveLength(12);
+        expect(articles).toHaveLength(10);
         articles.forEach((article) => {
           expect(article.topic).toBe("mitch");
         });
@@ -659,8 +659,8 @@ describe("GET /api/articles/topic_query", () => {
       });
   });
 });
-//TODO: Basic testing for pagination
-describe.only("?p & limit", () => {
+
+describe("?p & limit", () => {
   test("GET: 200 takes optional limit (limits the number of responses) query, and responds with the articles paginated according to the limit provided", () => {
     return request(app)
       .get("/api/articles?limit=5")
