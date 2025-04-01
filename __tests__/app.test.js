@@ -616,7 +616,7 @@ describe("GET /api/articles/sorting_queries", () => {
       .get("/api/articles?sort_by=invalidSort")
       .expect(400)
       .then(({ body: { message } }) => {
-        expect(message).toBe("Bad request");
+        expect(message).toBe("Invalid sorting query");
       });
   });
   test("400: Responds with an error message if invalid order is used for queries", () => {
@@ -624,7 +624,7 @@ describe("GET /api/articles/sorting_queries", () => {
       .get("/api/articles?order=invalidOrder")
       .expect(400)
       .then(({ body: { message } }) => {
-        expect(message).toBe("Bad request");
+        expect(message).toBe("Invalid sorting query");
       });
   });
 });
@@ -658,6 +658,57 @@ describe("GET /api/articles/topic_query", () => {
         expect(message).toBe("Not found");
       });
   });
+});
+//TODO: Basic testing for pagination
+xdescribe("?p & limit", () => {
+  test("GET: 200 takes optional limit (limits the number of responses) query, and responds with the articles paginated according to the limit provided", () => {
+    return request(app)
+      .get("/api/articles?limit=5")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(5);
+      });
+  });
+  test("GET: 200 takes additional p query (specifies the page at which to start) and responds with the array paginated according to the limit and page provided", () => {
+    return request(app)
+      .get("/api/articles?limit=5&p=3")
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles.length).toBe(3);
+      });
+  });
+  // test("GET: 200 returns paginated array and a total_count property (which displays the total number of articles with any filters applied, discounting the limit)", () => {
+  //   return request(app)
+  //     .get("/api/articles?limit=5&p=3")
+  //     .expect(200)
+  //     .then(({ body }) => {
+  //       expect(body.total_count).toBe(13);
+  //     });
+  // });
+  // test("GET: 200 returns paginated array, with limit defaulting to 10 if not provided", () => {
+  //   return request(app)
+  //     .get("/api/articles?p=2")
+  //     .expect(200)
+  //     .then(({ body }) => {
+  //       expect(body.articles.length).toBe(3);
+  //     });
+  // });
+  // test("GET: 400 responds with appropriate status code and error message if passed an invalid limit (must be an integer)", () => {
+  //   return request(app)
+  //     .get("/api/articles?limit=notalimit")
+  //     .expect(400)
+  //     .then(({ body }) => {
+  //       expect(body.msg).toBe("Invalid input - must be a positive integer!");
+  //     });
+  // });
+  // test("GET: 400 responds with appropriate status code and error message if passed an invalid page number (must be an integer)", () => {
+  //   return request(app)
+  //     .get("/api/articles?p=notanumber")
+  //     .expect(400)
+  //     .then(({ body }) => {
+  //       expect(body.msg).toBe("Invalid input - must be a positive integer!");
+  //     });
+  // });
 });
 
 describe("Route not found", () => {

@@ -1,5 +1,5 @@
 const db = require("../db/connection");
-
+//TODO: Implement pagination (using limit, p)
 exports.fetchAllArticles = (sort_by = "created_at", order = "DESC", topic) => {
   const validSortBy = [
     "article_id",
@@ -9,12 +9,13 @@ exports.fetchAllArticles = (sort_by = "created_at", order = "DESC", topic) => {
     "created_at",
     "votes",
   ];
-  if (!validSortBy.includes(sort_by)) {
-    return Promise.reject({ status: 400, message: "Bad request" });
-  }
   const validOrder = ["ASC", "DESC"];
-  if (!validOrder.includes(order.toUpperCase())) {
-    return Promise.reject({ status: 400, message: "Bad request" });
+
+  if (
+    !validSortBy.includes(sort_by) ||
+    !validOrder.includes(order.toUpperCase())
+  ) {
+    return Promise.reject({ status: 400, message: "Invalid sorting query" });
   }
 
   let whereSort = " ";

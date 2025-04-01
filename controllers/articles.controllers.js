@@ -7,7 +7,7 @@ const {
   removeArticleById,
 } = require("../models/articles.models");
 const { fetchTopicIfSlugExists } = require("../models/topics.models");
-
+//TODO : Implement pagination
 exports.getArticles = (req, res, next) => {
   const { sort_by, order, topic } = req.query;
   const promises = [fetchAllArticles(sort_by, order, topic)];
