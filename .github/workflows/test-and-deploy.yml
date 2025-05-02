@@ -31,22 +31,6 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Wait for PSQL to be ready
-        run: |
-          for i in {1..10}; do
-            psql -U postgres -d nc_news_test -c '\q' && break
-            echo "Postgres is unavailable - sleeping"
-            sleep 2
-          done
-        env:
-          PGPASSWORD: ${{ secrets.PSQL_PSWRD }}
-
-      - name: Setup test database
-        run: |
-          psql -U postgres -d nc_news_test -f ./db/setup.sql
-        env:
-          PGPASSWORD: ${{ secrets.PSQL_PSWRD }}
-
       - name: Run tests
         env:
           NODE_ENV: test
