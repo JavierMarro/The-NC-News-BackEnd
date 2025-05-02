@@ -1,0 +1,40 @@
+name: CI Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Use PostgreSQL
+        uses: harmon758/postgresql-action@v1
+        with:
+          postgresql db: "nc_news_test"
+          postgresql user: "postgres"
+          postgresql password: ${{ secrets.PSQL_PSWRD }}
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        env:
+          NODE_ENV: test
+          PGDATABASE: nc_news_test
+          PGUSER: postgres
+          PGPASSWORD: ${{ secrets.PSQL_PSWRD }}
+        run: npm test
