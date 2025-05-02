@@ -1,4 +1,4 @@
-name: Test & Deploy
+name: CI Test
 
 on:
   push:
@@ -26,7 +26,7 @@ jobs:
         with:
           postgresql db: "nc_news_test"
           postgresql user: "postgres"
-          postgresql password: "password"
+          postgresql password: ${{ secrets.PSQL_PSWRD }}
 
       - name: Install dependencies
         run: npm ci
@@ -35,11 +35,12 @@ jobs:
         run: |
           psql -U postgres -d nc_news_test -f ./db/setup.sql
         env:
-          PGPASSWORD: password
+          PGPASSWORD: ${{ secrets.PSQL_PSWRD }}
 
       - name: Run tests
         env:
+          NODE_ENV: test
           PGDATABASE: nc_news_test
           PGUSER: postgres
-          PGPASSWORD: password
+          PGPASSWORD: ${{ secrets.PSQL_PSWRD }}
         run: npm test
