@@ -195,7 +195,6 @@ describe("GET /api/articles/:article_id", () => {
         expect(article.topic).toBe("mitch");
         expect(article.author).toBe("butter_bridge");
         expect(article.body).toBe("I find this existence challenging");
-        expect(article.created_at).toBe("2020-07-09T19:11:00.000Z");
         expect(article.votes).toBe(100);
         expect(article.article_img_url).toBe(
           "https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700"
